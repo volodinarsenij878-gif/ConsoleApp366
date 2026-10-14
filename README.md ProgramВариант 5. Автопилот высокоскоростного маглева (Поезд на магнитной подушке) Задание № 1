@@ -1,0 +1,71 @@
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    namespace Program1
+    {
+    internal class Program
+    {
+       static void Main()
+       {
+            Console.WriteLine("=== Пункт 1: Регулировка зазора левитации ===\n");
+
+            int coilCurrentAmperes = 850;      // начальный ток в катушках
+            double speedKmh = 520.0;            // текущая скорость
+
+            // Вызов метода: ref передаёт ток по ссылке (он может измениться),
+            // out вернёт зазор и флаг тревоги
+            AdjustLevitationGap(
+                ref coilCurrentAmperes,
+                speedKmh,
+                out double gapMillimeters,
+                out bool turbulenceAlarm
+            );
+
+            Console.WriteLine($"Начальная скорость: {speedKmh:F1} км/ч");
+            Console.WriteLine($"Скорректированный ток катушек: {coilCurrentAmperes} А");
+            Console.WriteLine($"Фактический зазор левитации: {gapMillimeters:F2} мм");
+            Console.WriteLine($"Тревога турбулентности (биение подвески): {(turbulenceAlarm ? "АКТИВНА" : "НЕТ")}");
+
+            Console.WriteLine("\nНажмите любую клавишу для выхода...");
+            Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Регулирует зазор левитации в зависимости от скорости.
+        /// Меняет ток катушек через ref, возвращает зазор и флаг аварии через out.
+        /// </summary>
+        public static void AdjustLevitationGap(
+            ref int coilCurrentAmperes,
+            double speedKmh,
+            out double gapMillimeters,
+            out bool turbulenceAlarm)
+        {
+            const double baseGap = 15.0;        // базовый зазор при низкой скорости (мм)
+            const double gapReductionPer100Kph = 2.5; // уменьшение зазора на каждые 100 км/ч
+
+            // Считаем зазор: чем выше скорость — тем меньше зазор (аэродинамика и динамика подвески)
+            double gapReduction = (speedKmh / 100.0) * gapReductionPer100Kph;
+            gapMillimeters = Math.Max(2.0, baseGap - gapReduction); // не меньше 2 мм
+
+            // Корректируем ток катушек в зависимости от зазора
+            if (gapMillimeters < 5.0)
+            {
+                // Зазор критически мал — форсируем катушки
+                coilCurrentAmperes += 120;
+            }
+            else if (gapMillimeters > 12.0)
+            {
+                // Зазор слишком большой — экономим энергию
+                coilCurrentAmperes -= 80;
+            }
+
+            // Оценка риска турбулентности/биения подвески
+            // Риск растёт с квадратом скорости и обратно пропорционально зазору
+            double riskFactor = (speedKmh * speedKmh) / (10000.0 * gapMillimeters);
+            turbulenceAlarm = riskFactor > 2.0; // порог срабатывания тревоги
+        }
+    }
+    }
