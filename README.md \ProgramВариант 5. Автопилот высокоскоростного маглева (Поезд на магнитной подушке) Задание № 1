@@ -1,0 +1,23 @@
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    namespace Program1
+    {
+    internal class Program
+    {
+        public class MaglevControl
+        {
+            public void AdjustLevitationGap(ref int coilCurrentAmperes, double speedKmh, out double gapMillimeters, out bool turbulenceAlarm)
+            {
+                // Здесь должна быть сложная логика расчёта зазора
+                // Для примера: симуляция
+                gapMillimeters = 10.5 + (coilCurrentAmperes * 0.01) - (speedKmh / 1000); // Пример формулы
+
+                // Имитация датчика турбулентности
+                turbulenceAlarm = gapMillimeters > 5.0; // Опасное биение
+            }
+        }
+        }  
