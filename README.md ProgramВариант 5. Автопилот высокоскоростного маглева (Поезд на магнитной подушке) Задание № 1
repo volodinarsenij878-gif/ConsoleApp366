@@ -1,0 +1,22 @@
+     public class MaglevAutopilot
+     {
+    // 1. AdjustLevitationGap: контроль зазора левитации и турбулентности
+    public static void AdjustLevitationGap(ref int coilCurrentAmperes, double speedKmh, out double gapMillimeters, out bool turbulenceAlarm)
+    {
+        // Базовая логика: чем выше скорость, тем сложнее держать стабильный зазор
+        double baseGap = 15.0; // мм — номинальный зазор при низкой скорости
+        double speedFactor = speedKmh / 500.0;
+        gapMillimeters = baseGap * (1.0 + 0.2 * speedFactor);
+
+        // Турбулентность: эмуляция пороговой логики (на практике — данные с датчиков)
+        turbulenceAlarm = false;
+        if (speedKmh > 500 && coilCurrentAmperes < 800)
+        {
+            turbulenceAlarm = true;
+            // Коррекция тока для компенсации нестабильности
+            coilCurrentAmperes += 150;
+        }
+
+        // Дополнительно: небольшой дрейф зазора из-за нагрева катушек
+        gapMillimeters += 0.5;
+    }
